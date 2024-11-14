@@ -255,40 +255,39 @@ export default function MainStage({
               grp.to({
                 scaleX: childrenScale,
                 scaleY: childrenScale,
-                duration: 0.3
+                duration: 0
               })
             })
           }
         })
 
-        eventStage.to({
-          width: eventStage.width(),
-          height: eventStage.height(),
-          scaleX: boundedScale,
-          scaleY: boundedScale,
-          x,
-          y,
-          onFinish: () => {
-            setStage({
-              width: eventStage.width(),
-              height: eventStage.height(),
-              scale: boundedScale,
-              x,
-              y,
-            });
-          },
-          duration: 0.3
-        })
-  
+        eventStage.scaleX(boundedScale);
+        eventStage.scaleY(boundedScale)
+        eventStage.position({x, y})
+
         lastDist = dist;
         lastCenter = newCenter;
       }
     }
   }
 
-  const handleTouchEnd = () => {
+  const handleTouchEnd = (e: KonvaEventObject<TouchEvent>) => {
+    e.evt.preventDefault();
+
     lastDist = 0;
     lastCenter = null;
+
+    const eventStage = e.target.getStage();
+
+    if (eventStage) {
+      setStage({
+        width: eventStage.width(),
+        height: eventStage.height(),
+        scale: eventStage.scaleX(),
+        x: eventStage.position().x,
+        y: eventStage.position().y,
+      });  
+    }
   }
 
   return (
