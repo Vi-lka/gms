@@ -17,6 +17,7 @@ import getIntersections, { PLACEHOLDER_DATA } from '@/lib/intersections/get-inte
 import valueFromWindowWidth from '@/lib/intersections/valueFromWindowWidth';
 import { useAtom, useSetAtom } from "jotai"
 import { stageAtom, stageRefAtom } from '@/lib/atoms/main';
+import Konva from 'konva';
 
 export default function MainStage({
   className,
@@ -155,6 +156,7 @@ export default function MainStage({
     else return { x, y };
   }
 
+  Konva.hitOnDragEnabled = true
 
   function getDistance(p1: { x: number, y: number }, p2: { x: number, y: number }) {
     return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
