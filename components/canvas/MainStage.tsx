@@ -223,9 +223,9 @@ export default function MainStage({
   
         const newScale = eventStage.scaleX() * (dist / lastDist);
 
-        let boundedScale = newScale;
-        if (newScale < MIN_SCALE) boundedScale = MIN_SCALE;
-        if (newScale > MAX_SCALE) boundedScale = MAX_SCALE;
+        // let boundedScale = newScale;
+        // if (newScale < MIN_SCALE) boundedScale = MIN_SCALE;
+        // if (newScale > MAX_SCALE) boundedScale = MAX_SCALE;
 
   
         // calculate new position of the stage
@@ -240,9 +240,9 @@ export default function MainStage({
         //   ? newCenter.y - pointTo.y * boundedScale + dy
         //   : (height*(1-MIN_SCALE))/2
 
-        const x = newCenter.x - pointTo.x * boundedScale + dx
+        const x = newCenter.x - pointTo.x * newScale + dx
 
-        const y = newCenter.y - pointTo.y * boundedScale + dy
+        const y = newCenter.y - pointTo.y * newScale + dy
 
         // const childrenScale = valueFromWindowWidth({
         //   windowW: width,
@@ -263,8 +263,8 @@ export default function MainStage({
         //   }
         // })
 
-        eventStage.scaleX(boundedScale);
-        eventStage.scaleY(boundedScale)
+        eventStage.scaleX(newScale);
+        eventStage.scaleY(newScale)
         eventStage.position({x, y})
 
         lastDist = dist;
