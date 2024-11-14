@@ -223,27 +223,31 @@ export default function MainStage({
   
         const newScale = eventStage.scaleX() * (dist / lastDist);
 
-        let boundedScale = newScale;
-        if (newScale < MIN_SCALE) boundedScale = MIN_SCALE;
-        if (newScale > MAX_SCALE) boundedScale = MAX_SCALE;
+        // let boundedScale = newScale;
+        // if (newScale < MIN_SCALE) boundedScale = MIN_SCALE;
+        // if (newScale > MAX_SCALE) boundedScale = MAX_SCALE;
   
         // calculate new position of the stage
         const dx = newCenter.x - lastCenter.x;
         const dy = newCenter.y - lastCenter.y;
 
-        const x = boundedScale >= MIN_SCALE 
-          ? newCenter.x - pointTo.x * boundedScale + dx
-          : (width*(1-MIN_SCALE))/2;
+        // const x = boundedScale >= MIN_SCALE 
+        //   ? newCenter.x - pointTo.x * boundedScale + dx
+        //   : (width*(1-MIN_SCALE))/2;
 
-        const y = boundedScale >= MIN_SCALE 
-          ? newCenter.y - pointTo.y * boundedScale + dy
-          : (height*(1-MIN_SCALE))/2
+        // const y = boundedScale >= MIN_SCALE 
+        //   ? newCenter.y - pointTo.y * boundedScale + dy
+        //   : (height*(1-MIN_SCALE))/2
+
+        const x = newCenter.x - pointTo.x * newScale + dx
+
+        const y = newCenter.y - pointTo.y * newScale + dy
 
         const childrenScale = valueFromWindowWidth({
           windowW: width,
-          w1024: 1.2/boundedScale,
-          w425: 1.8/boundedScale,
-          minw: 2.4/boundedScale,
+          w1024: 1.2/newScale,
+          w425: 1.8/newScale,
+          minw: 2.4/newScale,
         })
   
         eventStage.children.forEach(lr => {
@@ -252,7 +256,7 @@ export default function MainStage({
               grp.to({
                 scaleX: childrenScale,
                 scaleY: childrenScale,
-                duration: 0
+                duration: 0.1
               })
             })
           }
@@ -261,20 +265,20 @@ export default function MainStage({
         eventStage.to({
           width: eventStage.width(),
           height: eventStage.height(),
-          scaleX: boundedScale,
-          scaleY: boundedScale,
+          scaleX: newScale,
+          scaleY: newScale,
           x,
           y,
           onFinish: () => {
             setStage({
               width: eventStage.width(),
               height: eventStage.height(),
-              scale: boundedScale,
+              scale: newScale,
               x,
               y,
             });
           },
-          duration: 0
+          duration: 0.1
         })
   
         lastDist = dist;
