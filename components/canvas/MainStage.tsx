@@ -297,7 +297,7 @@ export default function MainStage({
         ref={ref}
         width={width}
         height={height}
-        draggable
+        draggable={false}
         // dragBoundFunc={handleDragBound}
         onWheel={handleWheel}
         onTouchMove={handleTouchMove}
