@@ -253,11 +253,8 @@ export default function MainStage({
         eventStage.children.forEach(lr => {
           if (lr.attrs.id !== "main-image") {
             lr.children.forEach(grp => {
-              grp.to({
-                scaleX: childrenScale,
-                scaleY: childrenScale,
-                duration: 0.1
-              })
+              grp.scaleX(childrenScale)
+              grp.scaleY(childrenScale)
             })
           }
         })
