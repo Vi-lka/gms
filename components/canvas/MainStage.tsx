@@ -226,40 +226,42 @@ export default function MainStage({
         let boundedScale = newScale;
         if (newScale < MIN_SCALE) boundedScale = MIN_SCALE;
         if (newScale > MAX_SCALE) boundedScale = MAX_SCALE;
-  
-        eventStage.scaleX(boundedScale);
-        eventStage.scaleY(boundedScale);
+
   
         // calculate new position of the stage
         const dx = newCenter.x - lastCenter.x;
         const dy = newCenter.y - lastCenter.y;
 
-        const x = boundedScale >= MIN_SCALE 
-          ? newCenter.x - pointTo.x * boundedScale + dx
-          : (width*(1-MIN_SCALE))/2;
+        // const x = boundedScale >= MIN_SCALE 
+          // ? newCenter.x - pointTo.x * boundedScale + dx
+          // : (width*(1-MIN_SCALE))/2;
 
-        const y = boundedScale >= MIN_SCALE 
-          ? newCenter.y - pointTo.y * boundedScale + dy
-          : (height*(1-MIN_SCALE))/2
+        // const y = boundedScale >= MIN_SCALE 
+        //   ? newCenter.y - pointTo.y * boundedScale + dy
+        //   : (height*(1-MIN_SCALE))/2
 
-        const childrenScale = valueFromWindowWidth({
-          windowW: width,
-          w1024: 1.2/boundedScale,
-          w425: 1.8/boundedScale,
-          minw: 2.4/boundedScale,
-        })
+        const x = newCenter.x - pointTo.x * boundedScale + dx
+
+        const y = newCenter.y - pointTo.y * boundedScale + dy
+
+        // const childrenScale = valueFromWindowWidth({
+        //   windowW: width,
+        //   w1024: 1.2/boundedScale,
+        //   w425: 1.8/boundedScale,
+        //   minw: 2.4/boundedScale,
+        // })
   
-        eventStage.children.forEach(lr => {
-          if (lr.attrs.id !== "main-image") {
-            lr.children.forEach(grp => {
-              grp.to({
-                scaleX: childrenScale,
-                scaleY: childrenScale,
-                duration: 0
-              })
-            })
-          }
-        })
+        // eventStage.children.forEach(lr => {
+        //   if (lr.attrs.id !== "main-image") {
+        //     lr.children.forEach(grp => {
+        //       grp.to({
+        //         scaleX: childrenScale,
+        //         scaleY: childrenScale,
+        //         duration: 0
+        //       })
+        //     })
+        //   }
+        // })
 
         eventStage.scaleX(boundedScale);
         eventStage.scaleY(boundedScale)
