@@ -262,34 +262,31 @@ export default function MainStage({
           }
         })
 
-        eventStage.to({
-          width: eventStage.width(),
-          height: eventStage.height(),
-          scaleX: newScale,
-          scaleY: newScale,
-          x,
-          y,
-          onFinish: () => {
-            setStage({
-              width: eventStage.width(),
-              height: eventStage.height(),
-              scale: newScale,
-              x,
-              y,
-            });
-          },
-          duration: 0.1
-        })
-  
+        eventStage.scaleX(newScale)
+        eventStage.scaleY(newScale)
+        eventStage.position({x, y})
+
         lastDist = dist;
         lastCenter = newCenter;
       }
     }
   }
 
-  const handleTouchEnd = () => {
+  const handleTouchEnd = (e: KonvaEventObject<TouchEvent>) => {
     lastDist = 0;
     lastCenter = null;
+
+    const eventStage = e.target.getStage();
+
+    if (eventStage) {
+      setStage({
+        width: eventStage.width(),
+        height: eventStage.height(),
+        scale: eventStage.scaleX(),
+        x: eventStage.x(),
+        y: eventStage.y(),
+      });
+    }
   }
 
   return (
@@ -297,8 +294,8 @@ export default function MainStage({
         ref={ref}
         width={width}
         height={height}
-        draggable={false}
-        // dragBoundFunc={handleDragBound}
+        draggable
+        dragBoundFunc={handleDragBound}
         onWheel={handleWheel}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
