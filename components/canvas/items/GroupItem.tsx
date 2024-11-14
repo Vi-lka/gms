@@ -8,7 +8,7 @@ import getGroupAverage from '@/lib/intersections/get-group-average'
 import { IntersectionGroupT } from '@/lib/intersections/get-intersections'
 import valueFromWindowWidth from '@/lib/intersections/valueFromWindowWidth'
 import { useAtom, useAtomValue } from 'jotai'
-import React from 'react'
+import React, { useRef } from 'react'
 import { Html } from 'react-konva-utils'
 
 export default function GroupItem({
@@ -16,6 +16,9 @@ export default function GroupItem({
 }: {
   data: IntersectionGroupT,
 }) {
+
+  const ref = useRef<HTMLButtonElement>(null);
+
   const [stage, setStage] = useAtom(stageAtom);
   const stageRef = useAtomValue(stageRefAtom)
 
@@ -42,63 +45,67 @@ export default function GroupItem({
   )
 
   const handleScaleTo = () => {
-    const scaleBy = 10;
+    if (stageRef && ref.current) {
+      const box = ref.current.getClientRects();
 
-    if (stageRef) {
-      const oldScale = stageRef.scaleX();
-      const mousePoint = stageRef.getPointerPosition() ?? {x: 0, y: 0};
+      const rectItem = box.item(0)
 
-      const newScale =  oldScale * scaleBy 
+      if (rectItem) {
+        const scaleBy = Math.min(stageRef.width() / rectItem.width, stageRef.height() / rectItem.height) / 2;
+        console.log(scaleBy)
+        const oldScale = stageRef.scaleX(); 
+        const newScale =  oldScale * scaleBy 
 
-      const mousePointTo = {
-        x: mousePoint.x / oldScale - stageRef.x() / oldScale,
-        y: mousePoint.y / oldScale - stageRef.y() / oldScale
-      };
-
-      let boundedScale = newScale;
-      if (newScale < MIN_SCALE) boundedScale = MIN_SCALE;
-      if (newScale > MAX_SCALE) boundedScale = MAX_SCALE;
-
-      const x = (mousePoint.x / boundedScale - mousePointTo.x) * boundedScale
-      const y = (mousePoint.y / boundedScale - mousePointTo.y) * boundedScale
-
-      const childrenScale = valueFromWindowWidth({
-        windowW: width,
-        w1024: 1.2/boundedScale,
-        w425: 1.8/boundedScale,
-        minw: 2.4/boundedScale,
-      })
-
-      stageRef.children.forEach(lr => {
-        if (lr.attrs.id !== "main-image") {
-          lr.children.forEach(grp => {
-            grp.to({
-              scaleX: childrenScale,
-              scaleY: childrenScale,
-              duration: 0.3
+        const mousePointTo = {
+          x: rectItem.x / oldScale - stageRef.x() / oldScale,
+          y: rectItem.y / oldScale - stageRef.y() / oldScale
+        };
+  
+        let boundedScale = newScale;
+        if (newScale < MIN_SCALE) boundedScale = MIN_SCALE;
+        if (newScale > MAX_SCALE) boundedScale = MAX_SCALE;
+  
+        const x = (rectItem.x / boundedScale - mousePointTo.x) * boundedScale
+        const y = (rectItem.y / boundedScale - mousePointTo.y) * boundedScale
+  
+        const childrenScale = valueFromWindowWidth({
+          windowW: width,
+          w1024: 1.2/boundedScale,
+          w425: 1.8/boundedScale,
+          minw: 2.4/boundedScale,
+        })
+  
+        stageRef.children.forEach(lr => {
+          if (lr.attrs.id !== "main-image") {
+            lr.children.forEach(grp => {
+              grp.to({
+                scaleX: childrenScale,
+                scaleY: childrenScale,
+                duration: 0.3
+              })
             })
-          })
-        }
-      })
-
-      stageRef.to({
-        width: stageRef.width(),
-        height: stageRef.height(),
-        scaleX: boundedScale,
-        scaleY: boundedScale,
-        x,
-        y,
-        onFinish: () => {
-          setStage({
-            width: stageRef.width(),
-            height: stageRef.height(),
-            scale: boundedScale,
-            x,
-            y
-          });
-        },
-        duration: 0.3
-      })
+          }
+        })
+  
+        stageRef.to({
+          width: stageRef.width(),
+          height: stageRef.height(),
+          scaleX: boundedScale,
+          scaleY: boundedScale,
+          x,
+          y,
+          onFinish: () => {
+            setStage({
+              width: stageRef.width(),
+              height: stageRef.height(),
+              scale: boundedScale,
+              x,
+              y
+            });
+          },
+          duration: 0.3
+        })
+      }
     }
   }
 
@@ -121,6 +128,7 @@ export default function GroupItem({
     >
       <div className='relative' style={{scale: size.width < 1 ? size.width : 1}}>
         <Button
+          ref={ref}
           className="absolute p-3 aspect-square rounded-full" 
           onClick={handleScaleTo}
         >
