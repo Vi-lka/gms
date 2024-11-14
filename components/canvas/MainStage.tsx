@@ -155,6 +155,142 @@ export default function MainStage({
     else return { x, y };
   }
 
+
+  function getDistance(p1: { x: number, y: number }, p2: { x: number, y: number }) {
+    return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
+  }
+
+  function getCenter(p1: { x: number, y: number }, p2: { x: number, y: number }) {
+    return {
+      x: (p1.x + p2.x) / 2,
+      y: (p1.y + p2.y) / 2,
+    };
+  }
+
+  let lastCenter: { x: number, y: number } | null = null;
+  let lastDist = 0;
+  let dragStopped = false;
+
+  const handleTouchMove = (e: KonvaEventObject<TouchEvent>) => {
+    e.evt.preventDefault();
+
+    const touch1 = e.evt.touches[0];
+    const touch2 = e.evt.touches[1];
+
+    const eventStage = e.target.getStage();
+
+    if (eventStage) {
+      // we need to restore dragging, if it was cancelled by multi-touch
+      if (touch1 && !touch2 && !eventStage.isDragging() && dragStopped) {
+        eventStage.startDrag();
+        dragStopped = false;
+      }
+
+      if (touch1 && touch2) {
+        // if the stage was under Konva's drag&drop
+        // we need to stop it, and implement our own pan logic with two pointers
+        if (eventStage.isDragging()) {
+          dragStopped = true;
+          eventStage.stopDrag();
+        }
+  
+        const p1 = {
+          x: touch1.clientX,
+          y: touch1.clientY,
+        };
+        const p2 = {
+          x: touch2.clientX,
+          y: touch2.clientY,
+        };
+  
+        if (!lastCenter) {
+          lastCenter = getCenter(p1, p2);
+          return;
+        }
+        const newCenter = getCenter(p1, p2);
+  
+        const dist = getDistance(p1, p2);
+  
+        if (!lastDist) {
+          lastDist = dist;
+        }
+  
+        // local coordinates of center point
+        const pointTo = {
+          x: (newCenter.x - eventStage.x()) / eventStage.scaleX(),
+          y: (newCenter.y - eventStage.y()) / eventStage.scaleX(),
+        };
+  
+        const newScale = eventStage.scaleX() * (dist / lastDist);
+
+        let boundedScale = newScale;
+        if (newScale < MIN_SCALE) boundedScale = MIN_SCALE;
+        if (newScale > MAX_SCALE) boundedScale = MAX_SCALE;
+  
+        eventStage.scaleX(boundedScale);
+        eventStage.scaleY(boundedScale);
+  
+        // calculate new position of the stage
+        const dx = newCenter.x - lastCenter.x;
+        const dy = newCenter.y - lastCenter.y;
+
+        const x = boundedScale >= MIN_SCALE 
+          ? newCenter.x - pointTo.x * boundedScale + dx
+          : (width*(1-MIN_SCALE))/2;
+
+        const y = boundedScale >= MIN_SCALE 
+          ? newCenter.y - pointTo.y * boundedScale + dy
+          : (height*(1-MIN_SCALE))/2
+
+        const childrenScale = valueFromWindowWidth({
+          windowW: width,
+          w1024: 1.2/boundedScale,
+          w425: 1.8/boundedScale,
+          minw: 2.4/boundedScale,
+        })
+  
+        eventStage.children.forEach(lr => {
+          if (lr.attrs.id !== "main-image") {
+            lr.children.forEach(grp => {
+              grp.to({
+                scaleX: childrenScale,
+                scaleY: childrenScale,
+                duration: 0.3
+              })
+            })
+          }
+        })
+
+        eventStage.to({
+          width: eventStage.width(),
+          height: eventStage.height(),
+          scaleX: boundedScale,
+          scaleY: boundedScale,
+          x,
+          y,
+          onFinish: () => {
+            setStage({
+              width: eventStage.width(),
+              height: eventStage.height(),
+              scale: boundedScale,
+              x,
+              y,
+            });
+          },
+          duration: 0.3
+        })
+  
+        lastDist = dist;
+        lastCenter = newCenter;
+      }
+    }
+  }
+
+  const handleTouchEnd = () => {
+    lastDist = 0;
+    lastCenter = null;
+  }
+
   return (
       <Stage 
         ref={ref}
@@ -163,6 +299,8 @@ export default function MainStage({
         draggable
         dragBoundFunc={handleDragBound}
         onWheel={handleWheel}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
         className={cn("overflow-hidden relative", className)}
       >
         <Layer id='main-image'>
