@@ -233,13 +233,10 @@ export default function MainStage({
         const dx = newCenter.x - lastCenter.x;
         const dy = newCenter.y - lastCenter.y;
 
-        const x = boundedScale >= MIN_SCALE 
-          ? newCenter.x - pointTo.x * boundedScale + dx
-          : (width*(1-MIN_SCALE))/2;
-
-        const y = boundedScale >= MIN_SCALE 
-          ? newCenter.y - pointTo.y * boundedScale + dy
-          : (height*(1-MIN_SCALE))/2
+        const newPos = {
+          x: newCenter.x - pointTo.x * boundedScale + dx,
+          y: newCenter.y - pointTo.y * boundedScale + dy
+        }
 
         const childrenScale = valueFromWindowWidth({
           windowW: width,
@@ -259,7 +256,7 @@ export default function MainStage({
 
         eventStage.scaleX(boundedScale)
         eventStage.scaleY(boundedScale)
-        eventStage.position({x, y})
+        eventStage.position(newPos)
 
         lastDist = dist;
         lastCenter = newCenter;
