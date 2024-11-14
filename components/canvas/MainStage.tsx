@@ -274,22 +274,20 @@ export default function MainStage({
   }
 
   const handleTouchEnd = (e: KonvaEventObject<TouchEvent>) => {
-    e.evt.preventDefault();
-
     lastDist = 0;
     lastCenter = null;
 
-    const eventStage = e.target.getStage();
+    // const eventStage = e.target.getStage();
 
-    if (eventStage) {
-      setStage({
-        width: eventStage.width(),
-        height: eventStage.height(),
-        scale: eventStage.scaleX(),
-        x: eventStage.position().x,
-        y: eventStage.position().y,
-      });  
-    }
+    // if (eventStage) {
+    //   setStage({
+    //     width: eventStage.width(),
+    //     height: eventStage.height(),
+    //     scale: eventStage.scaleX(),
+    //     x: eventStage.position().x,
+    //     y: eventStage.position().y,
+    //   });  
+    // }
   }
 
   return (
