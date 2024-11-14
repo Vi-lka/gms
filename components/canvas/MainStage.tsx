@@ -223,71 +223,69 @@ export default function MainStage({
   
         const newScale = eventStage.scaleX() * (dist / lastDist);
 
-        // let boundedScale = newScale;
-        // if (newScale < MIN_SCALE) boundedScale = MIN_SCALE;
-        // if (newScale > MAX_SCALE) boundedScale = MAX_SCALE;
-
+        let boundedScale = newScale;
+        if (newScale < MIN_SCALE) boundedScale = MIN_SCALE;
+        if (newScale > MAX_SCALE) boundedScale = MAX_SCALE;
   
         // calculate new position of the stage
         const dx = newCenter.x - lastCenter.x;
         const dy = newCenter.y - lastCenter.y;
 
-        // const x = boundedScale >= MIN_SCALE 
-          // ? newCenter.x - pointTo.x * boundedScale + dx
-          // : (width*(1-MIN_SCALE))/2;
+        const x = boundedScale >= MIN_SCALE 
+          ? newCenter.x - pointTo.x * boundedScale + dx
+          : (width*(1-MIN_SCALE))/2;
 
-        // const y = boundedScale >= MIN_SCALE 
-        //   ? newCenter.y - pointTo.y * boundedScale + dy
-        //   : (height*(1-MIN_SCALE))/2
+        const y = boundedScale >= MIN_SCALE 
+          ? newCenter.y - pointTo.y * boundedScale + dy
+          : (height*(1-MIN_SCALE))/2
 
-        const x = newCenter.x - pointTo.x * newScale + dx
-
-        const y = newCenter.y - pointTo.y * newScale + dy
-
-        // const childrenScale = valueFromWindowWidth({
-        //   windowW: width,
-        //   w1024: 1.2/boundedScale,
-        //   w425: 1.8/boundedScale,
-        //   minw: 2.4/boundedScale,
-        // })
+        const childrenScale = valueFromWindowWidth({
+          windowW: width,
+          w1024: 1.2/boundedScale,
+          w425: 1.8/boundedScale,
+          minw: 2.4/boundedScale,
+        })
   
-        // eventStage.children.forEach(lr => {
-        //   if (lr.attrs.id !== "main-image") {
-        //     lr.children.forEach(grp => {
-        //       grp.to({
-        //         scaleX: childrenScale,
-        //         scaleY: childrenScale,
-        //         duration: 0
-        //       })
-        //     })
-        //   }
-        // })
+        eventStage.children.forEach(lr => {
+          if (lr.attrs.id !== "main-image") {
+            lr.children.forEach(grp => {
+              grp.to({
+                scaleX: childrenScale,
+                scaleY: childrenScale,
+                duration: 0
+              })
+            })
+          }
+        })
 
-        eventStage.scaleX(newScale);
-        eventStage.scaleY(newScale)
-        eventStage.position({x, y})
-
+        eventStage.to({
+          width: eventStage.width(),
+          height: eventStage.height(),
+          scaleX: boundedScale,
+          scaleY: boundedScale,
+          x,
+          y,
+          onFinish: () => {
+            setStage({
+              width: eventStage.width(),
+              height: eventStage.height(),
+              scale: boundedScale,
+              x,
+              y,
+            });
+          },
+          duration: 0
+        })
+  
         lastDist = dist;
         lastCenter = newCenter;
       }
     }
   }
 
-  const handleTouchEnd = (e: KonvaEventObject<TouchEvent>) => {
+  const handleTouchEnd = () => {
     lastDist = 0;
     lastCenter = null;
-
-    // const eventStage = e.target.getStage();
-
-    // if (eventStage) {
-    //   setStage({
-    //     width: eventStage.width(),
-    //     height: eventStage.height(),
-    //     scale: eventStage.scaleX(),
-    //     x: eventStage.position().x,
-    //     y: eventStage.position().y,
-    //   });  
-    // }
   }
 
   return (
