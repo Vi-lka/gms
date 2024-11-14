@@ -254,15 +254,15 @@ export default function MainStage({
 
     const eventStage = e.target.getStage();
 
-    // if (eventStage) {
-    //   setStage({
-    //     width: eventStage.width(),
-    //     height: eventStage.height(),
-    //     scale: eventStage.scaleX(),
-    //     x: eventStage.x(),
-    //     y: eventStage.y(),
-    //   });
-    // }
+    if (eventStage) {
+      setStage({
+        width: eventStage.width(),
+        height: eventStage.height(),
+        scale: eventStage.scaleX(),
+        x: eventStage.x(),
+        y: eventStage.y(),
+      });
+    }
   }
 
   return (
