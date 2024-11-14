@@ -238,21 +238,21 @@ export default function MainStage({
           y: newCenter.y - pointTo.y * boundedScale + dy
         }
 
-        const childrenScale = valueFromWindowWidth({
-          windowW: width,
-          w1024: 1.2/boundedScale,
-          w425: 1.8/boundedScale,
-          minw: 2.4/boundedScale,
-        })
+        // const childrenScale = valueFromWindowWidth({
+        //   windowW: width,
+        //   w1024: 1.2/boundedScale,
+        //   w425: 1.8/boundedScale,
+        //   minw: 2.4/boundedScale,
+        // })
   
-        eventStage.children.forEach(lr => {
-          if (lr.attrs.id !== "main-image") {
-            lr.children.forEach(grp => {
-              grp.scaleX(childrenScale)
-              grp.scaleY(childrenScale)
-            })
-          }
-        })
+        // eventStage.children.forEach(lr => {
+        //   if (lr.attrs.id !== "main-image") {
+        //     lr.children.forEach(grp => {
+        //       grp.scaleX(childrenScale)
+        //       grp.scaleY(childrenScale)
+        //     })
+        //   }
+        // })
 
         eventStage.scaleX(boundedScale)
         eventStage.scaleY(boundedScale)
